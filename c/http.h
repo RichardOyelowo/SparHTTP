@@ -20,6 +20,7 @@ typedef struct {
 
 typedef struct {
     char status[256];
+    int header_count;
     Header header[MAX_HEADER];
     char body[MAX_BODY];
 } Response;
@@ -28,5 +29,7 @@ typedef struct {
 ssize_t receive_request(int client_socket, char *buffer, size_t buffer_size);
 int parse_request(char *buffer, RequestLine *request, Header *header, char **body);
 void build_response(Response *response);
+int serialize_response(Response *response, char *buffer, size_t buffer_size);
+
 
 #endif
