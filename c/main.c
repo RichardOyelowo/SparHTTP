@@ -11,6 +11,8 @@ int main() {
     printf("Welcome to SparHTTP\n");
     int server_socket = create_server();
     int client_socket = accept_client(server_socket);
+    char servers_response[BUFFER_SIZE];
+    Response response;
 
     ssize_t bytes_length;
     char buffer[BUFFER_SIZE];
@@ -24,33 +26,34 @@ int main() {
     bytes_length = receive_request(client_socket, buffer, sizeof(buffer));
     header_count = parse_request(buffer, &http_request, header, &client_msg);
 
-    // print parsed infos
+    // request_line and method
     printf("Reading %zd bytes...\n\n", bytes_length);
+    printf(
+        "Sender Request:\nMethod: %s\nPath: %s\nVersion: %s\n", 
+        http_request.method, http_request.path, http_request.version
+    );
 
-    printf("HTTP Request method: %s\n", http_request.method);
-    printf("HTTP Request path: %s\n", http_request.path);
-    printf("HTTP Request version: %s\n", http_request.version);
-
-    // printing header infos
+    // headers info
     for (int i = 0; i < header_count; i++) {
         printf("%s: %s\n", header[i].name, header[i].value);
     }
 
-    // message body 
-    printf("Client message: %s\n", client_msg);
-
-    // handling response to create_server
-    Response response;
-
+    // response for sender
     build_response(&response);
+    int response_length = serialize_response(
+        &response, 
+        servers_response, 
+        sizeof(servers_response)
+    );
 
-    // testing value is written
-    printf("\nResponse Created:\n");
-    printf("Status: %s\n", response.status);
-    printf("Body: %s\n", response.body);
-    for (int i = 0; i < 2; i++) {
-        printf("%s: %s\n", response.header[i].name, response.header[i].value);
-    }
+    ssize_t bytes_sent = send(
+        client_socket,
+        servers_response,
+        response_length,
+        0
+    );
+
+    printf("\nSent %zd bytes\n", bytes_sent);
 
     return 0;
 }

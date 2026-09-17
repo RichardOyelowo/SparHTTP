@@ -80,13 +80,47 @@ int parse_request(char *buffer, RequestLine *request_line, Header *header, char 
     return header_count;
 }
 
+
 void build_response(Response *response) {
     strcpy(response->status, "200 OK");
-    strcpy(response->body, "Connection Successfull");
+    strcpy(response->body, "Connection Successful\n");
 
     strcpy(response->header[0].name, "Server");
     strcpy(response->header[0].value, "SparHTTP");
 
     strcpy(response->header[1].name, "Content-Type");
     strcpy(response->header[1].value, "text/plain");
+
+    response->header_count = 2;
+}
+
+
+int serialize_response(Response * response, char *buffer, size_t buffer_size) {
+    int written = 0;
+
+    written += snprintf(
+        buffer + written, 
+        buffer_size - written, 
+        "HTTP/1.1 %s\r\n",
+        response->status
+    );
+    
+    // Handling header lines info
+    for (int i = 0; i < response->header_count; i++) {
+        written += snprintf(
+            buffer + written, 
+            buffer_size - written, 
+            "%s: %s\r\n", 
+            response->header[i].name, response->header[i].value
+        );
+    }
+
+    written += snprintf(
+        buffer + written, 
+        buffer_size - written, 
+        "\r\n%s", 
+        response->body
+    ); 
+
+    return written;
 }
