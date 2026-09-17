@@ -18,8 +18,15 @@ typedef struct {
     char version[30];
 } RequestLine;
 
+typedef struct {
+    char status[256];
+    Header header[MAX_HEADER];
+    char body[MAX_BODY];
+} Response;
+
+
 ssize_t receive_request(int client_socket, char *buffer, size_t buffer_size);
 int parse_request(char *buffer, RequestLine *request, Header *header, char **body);
-
+void build_response(Response *response);
 
 #endif
