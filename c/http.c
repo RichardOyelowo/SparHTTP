@@ -79,3 +79,14 @@ int parse_request(char *buffer, RequestLine *request_line, Header *header, char 
 
     return header_count;
 }
+
+void build_response(Response *response) {
+    strcpy(response->status, "200 OK");
+    strcpy(response->body, "Connection Successfull");
+
+    strcpy(response->header[0].name, "Server");
+    strcpy(response->header[0].value, "SparHTTP");
+
+    strcpy(response->header[1].name, "Content-Type");
+    strcpy(response->header[1].value, "text/plain");
+}

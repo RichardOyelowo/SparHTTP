@@ -39,5 +39,18 @@ int main() {
     // message body 
     printf("Client message: %s\n", client_msg);
 
+    // handling response to create_server
+    Response response;
+
+    build_response(&response);
+
+    // testing value is written
+    printf("\nResponse Created:\n");
+    printf("Status: %s\n", response.status);
+    printf("Body: %s\n", response.body);
+    for (int i = 0; i < 2; i++) {
+        printf("%s: %s\n", response.header[i].name, response.header[i].value);
+    }
+
     return 0;
 }
